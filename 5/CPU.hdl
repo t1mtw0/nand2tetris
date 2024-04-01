@@ -32,5 +32,74 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    Not(in=instruction[15], out=isAInstr);
+    Not(in=isAInstr, out=isCInstr);
+
+	Mux16(a=instruction, b=aluOut, sel=isCInstr, out=outA);
+
+    Or(a=isAInstr, b=instruction[5], out=loadA);
+    ARegister(in=outA, load=loadA, out=regA, out[0..14]=addressM);
+
+    And(a=isCInstr, b=instruction[4], out=loadD);
+    DRegister(in=aluOut, load=loadD, out=regD);
+
+    And(a=isCInstr, b=instruction[3], out=writeM);
+
+    Mux16(a=regA, b=inM, sel=instruction[12], out=aOrM);
+
+    ALU(x=regD, y=aOrM, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], zr=aluZr, ng=aluNg, out=aluOut, out=outM);
+    
+    Not(in=aluZr, out=notZr);
+    Not(in=aluNg, out=notNg);
+    Not(in=instruction[0], out=notJ0);
+    Not(in=instruction[1], out=notJ1);
+    Not(in=instruction[2], out=notJ2);
+
+    And(a=notZr, b=notNg, out=gtn);
+    And(a=notJ1, b=notJ2, out=jgt1);
+    And(a=instruction[0], b=gtn, out=jgt2);
+    And(a=jgt1, b=jgt2, out=jgt);
+
+    And(a=notJ2, b=instruction[1], out=jeq1);
+    And(a=notJ0, b=aluZr, out=jeq2);
+    And(a=jeq1, b=jeq2, out=jeq);
+
+    And(a=notJ2, b=instruction[1], out=jge1);
+    And(a=instruction[0], b=notNg, out=jge2);
+    And(a=jge1, b=jge2, out=jge);
+
+    And(a=instruction[2], b=notJ1, out=jlt1);
+    And(a=notJ0, b=aluNg, out=jlt2);
+    And(a=jlt1, b=jlt2, out=jlt);
+
+    And(a=instruction[2], b=notJ1, out=jne1);
+    And(a=instruction[0], b=notZr, out=jne2);
+    And(a=jne1, b=jne2, out=jne);
+
+    And(a=instruction[2], b=instruction[1], out=jle1);
+    Or(a=aluZr, b=aluNg, out=zrOrNg);
+    And(a=notJ0, b=zrOrNg, out=jle2);
+    And(a=jle1, b=jle2, out=jle);
+
+    And(a=instruction[2], b=instruction[1], out=jmp1);
+    And(a=jmp1, b=instruction[0], out=jmp);
+
+    And(a=notJ0, b=notJ1, out=noJmp1);
+    And(a=noJmp1, b=notJ2, out=noJmp);
+    Not(in=noJmp, out=notNoJmp);
+
+    Or8Way(in[0]=jgt,
+        in[1]=jeq,
+        in[2]=jge,
+        in[3]=jlt,
+        in[4]=jne,
+        in[5]=jle,
+        in[6]=jmp,
+        in[7]=false,
+        out=oneJmp1);
+    And(a=oneJmp1, b=notNoJmp, out=oneJmp2);
+    And(a=oneJmp2, b=isCInstr, out=loadPC);
+    Not(in=loadPC, out=inc);
+
+    PC(in=regA, reset=reset, load=loadPC, inc=inc, out[0..14]=pc);
 }
