@@ -174,7 +174,8 @@ char *arg2(struct Parser *p) {
     return p->arg2;
 }
 
-void free_parser(struct Parser *p) {
+void end_parser(struct Parser *p) {
+    fclose(p->fp);
     if (p->arg1 != NULL)
         free(p->arg1);
     if (p->arg2 != NULL)

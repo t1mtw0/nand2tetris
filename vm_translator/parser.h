@@ -29,6 +29,6 @@ bool advance(struct Parser *p);
 enum CommandType command_type(struct Parser *p);
 char *arg1(struct Parser *p);
 char *arg2(struct Parser *p);
-void free_parser(struct Parser *p);
+void end_parser(struct Parser *p);
 
 #endif
