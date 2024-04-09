@@ -17,6 +17,7 @@ enum CommandType {
 };
 
 struct Parser {
+    char *fi;
     FILE *fp;
     bool has_more_lines;
     enum CommandType command_type;
@@ -24,7 +25,7 @@ struct Parser {
     char *arg2;
 };
 
-struct Parser new_parser(FILE *fp);
+struct Parser new_parser(char *proj_dir, char *fi);
 bool advance(struct Parser *p);
 enum CommandType command_type(struct Parser *p);
 char *arg1(struct Parser *p);

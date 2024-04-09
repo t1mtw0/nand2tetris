@@ -5,8 +5,18 @@
 
 #include "common.h"
 
-struct Parser new_parser(FILE *fp) {
-    struct Parser p = {.fp = fp,
+struct Parser new_parser(char *proj_dir, char *fi) {
+    int proj_dir_l = strlen(proj_dir);
+    int fi_l = strlen(fi);
+    char fn[proj_dir_l + fi_l + 2];
+    strncpy(fn, proj_dir, proj_dir_l);
+    strncpy(fn + proj_dir_l, "/", 1);
+    strncpy(fn + proj_dir_l + 1, fi, fi_l + 1);
+    FILE *fp = fopen(fn, "r");
+    if (!fp)
+        exit(1);
+    struct Parser p = {.fi = fi,
+                       .fp = fp,
                        .has_more_lines = true,
                        .command_type = C_NULL,
                        .arg1 = NULL,
@@ -27,8 +37,13 @@ bool advance(struct Parser *p) {
         p->has_more_lines = false;
         return false;
     }
-    // trim whitespace
+    // remove potential comments from line
     char *line = l;
+    char *ss = strchr(line, '/');
+    if (ss && *(ss + 1) == '/') {
+        *ss = '\0';
+    }
+    // trim whitespace
     while (isspace((unsigned char)*line)) {
         line++;
         read--;
@@ -39,121 +54,179 @@ bool advance(struct Parser *p) {
         read--;
     }
     end[1] = '\0';
-    // skip comments and newlines
-    if (line[0] == '/' && line[1] == '/') {
-        free(l);
-        return advance(p);
-    }
+    // skip lines that are empty after processing
     if (line[0] == '\0') {
         free(l);
         return advance(p);
     }
     // free existing arg1 and arg2
-    if (p->arg1 != NULL) {
+    if (!p->arg1) {
         free(p->arg1);
         p->arg1 = NULL;
     }
-    if (p->arg2 != NULL) {
+    if (!p->arg2) {
         free(p->arg2);
         p->arg2 = NULL;
     }
+    // handle two argument commands
+    if (!strncmp(line, "push", 4) || !strncmp(line, "pop", 3) ||
+        !strncmp(line, "function", 8) || !strncmp(line, "call", 4)) {
+        // arg1
+        char *ss = NULL;
+        if (!strncmp(line, "push", 4) || !strncmp(line, "call", 4))
+            ss = line + 4;
+        else if (!strncmp(line, "pop", 3))
+            ss = line + 3;
+        else if (!strncmp(line, "function", 8))
+            ss = line + 8;
+        while (*ss != '\0') {
+            if (!isspace((unsigned char)*ss))
+                break;
+            ss++;
+        }
+        if (*ss == '\0') {
+            free(l);
+            fprintf(stderr, "%s\n", "Expected segment after command.");
+            exit(1);
+        }
+        char *es = ss;
+        while (*es != '\0') {
+            if (isspace((unsigned char)*es))
+                break;
+            es++;
+        }
+        if (*es == '\0') {
+            free(l);
+            fprintf(stderr, "%s\n", "Expected index after segment.");
+            exit(1);
+        }
+        char *arg1 = malloc(sizeof(char) * ((int)(es - ss) + 1));
+        strncpy(arg1, ss, (int)(es - ss));
+        arg1[es - ss] = '\0';
+        p->arg1 = arg1;
+        // arg2
+        char *si = es;
+        while (*si != '\0') {
+            if (!isspace((unsigned char)*si))
+                break;
+            si++;
+        }
+        if (*si == '\0') {
+            free(l);
+            fprintf(stderr, "%s\n", "Expected index after segment.");
+            exit(1);
+        }
+        char *ei = si;
+        while (*ei != '\0') {
+            if (isspace((unsigned char)*ei))
+                break;
+            ei++;
+        }
+        char *arg2 = malloc(sizeof(char) * ((int)(ei - si) + 1));
+        strncpy(arg2, si, (int)(ei - si));
+        arg2[ei - si] = '\0';
+        p->arg2 = arg2;
+    }
+    // handle single arg commands
+    if (!strncmp(line, "label", 5) || !strncmp(line, "goto", 4) || !strncmp(line, "if-goto", 7)) {
+        char *ss = NULL;
+        if (!strncmp(line, "label", 5))
+            ss = line + 5;
+        else if (!strncmp(line, "goto", 4))
+            ss = line + 4;
+        else if (!strncmp(line, "if-goto", 7))
+            ss = line + 7;
+        while (*ss != '\0') {
+            if (!isspace((unsigned char)*ss))
+                break;
+            ss++;
+        }
+        if (*ss == '\0') {
+            free(l);
+            fprintf(stderr, "%s\n", "Expected segment after command.");
+            exit(1);
+        }
+        char *es = ss;
+        while (*es != '\0') {
+            if (isspace((unsigned char)*es))
+                break;
+            es++;
+        }
+        char *arg1 = malloc(sizeof(char) * ((int)(es - ss) + 1));
+        strncpy(arg1, ss, (es - ss));
+        arg1[es - ss] = '\0';
+        p->arg1 = arg1;
+
+    }
     // parses according to command
-    if (strncmp(line, "push", 4) == 0) {
+    if (!strncmp(line, "push", 4)) {
         p->command_type = C_PUSH;
-        char *l = line + 5;
-        while (*l != '\0') {
-            if (isspace((unsigned char)*l))
-                break;
-            l++;
-        }
-        if (*l == '\0')
-            exit(1);
-        char *arg1 = malloc(sizeof(char) * (l - (line + 5)));
-        strncpy(arg1, line + 5, l - (line + 5));
-        p->arg1 = arg1;
-        l++;
-        char *m = l;
-        while (*m != '\0') {
-            m++;
-        }
-        char *arg2 = malloc(sizeof(char) * (m - l));
-        strncpy(arg2, l, m - l);
-        p->arg2 = arg2;
-    } else if (strncmp(line, "pop", 3) == 0) {
+    } else if (!strncmp(line, "pop", 3)) {
         p->command_type = C_POP;
-        char *l = line + 4;
-        while (*l != '\0') {
-            if (isspace((unsigned char)*l))
-                break;
-            l++;
-        }
-        if (*l == '\0')
-            exit(1);
-        char *arg1 = malloc(sizeof(char) * (l - (line + 4)));
-        strncpy(arg1, line + 4, l - (line + 4));
+    } else if (!strncmp(line, "add", 3)) {
+        p->command_type = C_ARITHMETIC;
+        char *arg1 = malloc(sizeof(char) * 4);
+        strncpy(arg1, "add", 4);
         p->arg1 = arg1;
-        l++;
-        char *m = l;
-        while (*m != '\0') {
-            m++;
-        }
-        char *arg2 = malloc(sizeof(char) * (m - l));
-        strncpy(arg2, l, m - l);
-        p->arg2 = arg2;
-    } else if (strncmp(line, "add", 3) == 0) {
+    } else if (!strncmp(line, "sub", 3)) {
+        p->command_type = C_ARITHMETIC;
+        char *arg1 = malloc(sizeof(char) * 4);
+        strncpy(arg1, "sub", 4);
+        p->arg1 = arg1;
+    } else if (!strncmp(line, "neg", 3)) {
+        p->command_type = C_ARITHMETIC;
+        char *arg1 = malloc(sizeof(char) * 4);
+        strncpy(arg1, "neg", 4);
+        p->arg1 = arg1;
+    } else if (!strncmp(line, "eq", 2)) {
         p->command_type = C_ARITHMETIC;
         char *arg1 = malloc(sizeof(char) * 3);
-        strncpy(arg1, "add", 3);
+        strncpy(arg1, "eq", 3);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "sub", 3) == 0) {
+    } else if (!strncmp(line, "gt", 2)) {
         p->command_type = C_ARITHMETIC;
         char *arg1 = malloc(sizeof(char) * 3);
-        strncpy(arg1, "sub", 3);
+        strncpy(arg1, "gt", 3);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "neg", 3) == 0) {
+    } else if (!strncmp(line, "lt", 2)) {
         p->command_type = C_ARITHMETIC;
         char *arg1 = malloc(sizeof(char) * 3);
-        strncpy(arg1, "neg", 3);
+        strncpy(arg1, "lt", 3);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "eq", 2) == 0) {
+    } else if (!strncmp(line, "and", 3)) {
         p->command_type = C_ARITHMETIC;
-        char *arg1 = malloc(sizeof(char) * 2);
-        strncpy(arg1, "eq", 2);
+        char *arg1 = malloc(sizeof(char) * 4);
+        strncpy(arg1, "and", 4);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "gt", 2) == 0) {
-        p->command_type = C_ARITHMETIC;
-        char *arg1 = malloc(sizeof(char) * 2);
-        strncpy(arg1, "gt", 2);
-        p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "lt", 2) == 0) {
-        p->command_type = C_ARITHMETIC;
-        char *arg1 = malloc(sizeof(char) * 2);
-        strncpy(arg1, "lt", 2);
-        p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "and", 3) == 0) {
+    } else if (!strncmp(line, "or", 2)) {
         p->command_type = C_ARITHMETIC;
         char *arg1 = malloc(sizeof(char) * 3);
-        strncpy(arg1, "and", 3);
+        strncpy(arg1, "or", 3);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "or", 2) == 0) {
+    } else if (!strncmp(line, "not", 3)) {
         p->command_type = C_ARITHMETIC;
-        char *arg1 = malloc(sizeof(char) * 2);
-        strncpy(arg1, "or", 2);
+        char *arg1 = malloc(sizeof(char) * 4);
+        strncpy(arg1, "not", 4);
         p->arg1 = arg1;
-        p->arg2 = NULL;
-    } else if (strncmp(line, "not", 3) == 0) {
-        p->command_type = C_ARITHMETIC;
-        char *arg1 = malloc(sizeof(char) * 3);
-        strncpy(arg1, "not", 3);
+    } else if (!strncmp(line, "label", 5)) {
+        p->command_type = C_LABEL;
+    } else if (!strncmp(line, "goto", 4)) {
+        p->command_type = C_GOTO;
+    } else if (!strncmp(line, "if-goto", 7)) {
+        p->command_type = C_IF;
+    } else if (!strncmp(line, "function", 8)) {
+        p->command_type = C_FUNCTION;
+    } else if (!strncmp(line, "call", 4)) {
+        p->command_type = C_CALL;
+    } else if (!strncmp(line, "return", 6)) {
+        p->command_type = C_RETURN;
+        char *arg1 = malloc(sizeof(char) * 7);
+        strncpy(arg1, "return", 7);
         p->arg1 = arg1;
-        p->arg2 = NULL;
+    } else {
+        fprintf(stderr, "%s\n", "Unrecognized VM Command.");
+        free(l);
+        exit(1);
     }
     free(l);
     return true;
@@ -176,8 +249,8 @@ char *arg2(struct Parser *p) {
 
 void end_parser(struct Parser *p) {
     fclose(p->fp);
-    if (p->arg1 != NULL)
+    if (p->arg1)
         free(p->arg1);
-    if (p->arg2 != NULL)
+    if (p->arg2)
         free(p->arg2);
 }

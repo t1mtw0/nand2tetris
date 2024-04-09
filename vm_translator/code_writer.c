@@ -3,6 +3,8 @@
 #include "parser.h"
 #include <string.h>
 
+// helper functions
+
 char *map_segment(char *segment) {
     if (strcmp(segment, "argument") == 0) {
         return "ARG";
@@ -55,9 +57,38 @@ void write_cmp_op(struct CodeWriter *cw, char *cmp) {
     cw->jmp_label++;
 }
 
-struct CodeWriter new_code_writer(char *prog_name, FILE *fp) {
-    struct CodeWriter cw = {.prog_name = prog_name, .fp = fp, .jmp_label = 0};
+void write_bootstrap(struct CodeWriter *cw) {
+    fputs("@256\n", cw->fp);
+    fputs("D=A\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    fputs("@Sys.init\n", cw->fp);
+    fputs("0;JMP\n", cw->fp);
+}
+
+// code writer functions
+
+struct CodeWriter new_code_writer(char *proj_dir, char *prog_name) {
+    int proj_dir_l = strlen(proj_dir);
+    int prog_name_l = strlen(prog_name);
+    char *fn = malloc(proj_dir_l + prog_name_l + 6);
+    strncpy(fn, proj_dir, strlen(proj_dir));
+    strncpy(fn + proj_dir_l, "/", 1);
+    strncpy(fn + proj_dir_l + 1, prog_name, prog_name_l);
+    strncpy(fn + proj_dir_l + prog_name_l + 1, ".asm", 5);
+    FILE *fp = fopen(fn, "w");
+    struct CodeWriter cw = {.fn = fn,
+                            .fp = fp,
+                            .file_name = NULL,
+                            .cur_fn = "Main.main",
+                            .jmp_label = 0,
+                            .fn_ret_label = 0};
+    write_bootstrap(&cw);
     return cw;
+}
+
+void set_file_name(struct CodeWriter *cw, char *file_name) {
+    cw->file_name = file_name;
 }
 
 void write_arithmetic(struct CodeWriter *cw, char *command) {
@@ -119,7 +150,7 @@ void write_push_pop(struct CodeWriter *cw, enum CommandType command,
             fputs("D=M\n", cw->fp);
         } else if (strcmp(segment, "static") == 0) {
             char s1[100];
-            snprintf(s1, 100, "@%s.%d\n", cw->prog_name, index);
+            snprintf(s1, 100, "@%s.%d\n", cw->file_name, index);
             fputs(s1, cw->fp);
             fputs("D=M\n", cw->fp);
         } else if (strcmp(segment, "constant") == 0) {
@@ -174,7 +205,7 @@ void write_push_pop(struct CodeWriter *cw, enum CommandType command,
             pop_and_address(cw);
             fputs("D=M\n", cw->fp);
             char s1[100];
-            snprintf(s1, 100, "@%s.%d\n", cw->prog_name, index);
+            snprintf(s1, 100, "@%s.%d\n", cw->file_name, index);
             fputs(s1, cw->fp);
             fputs("M=D\n", cw->fp);
         } else if (strcmp(segment, "pointer") == 0) {
@@ -207,4 +238,186 @@ void write_push_pop(struct CodeWriter *cw, enum CommandType command,
     }
 }
 
-void end_code_writer(struct CodeWriter *cw) { fclose(cw->fp); }
+void write_label(struct CodeWriter *cw, char *label) {
+    if (!cw->cur_fn) {
+        end_code_writer(cw);
+        fprintf(stderr, "%s\n", "Labels can only be inside functions.");
+        exit(1);
+    }
+    char s1[100];
+    snprintf(s1, 100, "(%s$%s)\n", cw->cur_fn, label);
+    fputs(s1, cw->fp);
+}
+
+void write_goto(struct CodeWriter *cw, char *label) {
+    if (!cw->cur_fn) {
+        end_code_writer(cw);
+        fprintf(stderr, "%s\n", "Gotos can only be inside functions.");
+        exit(1);
+    }
+    char s1[100];
+    snprintf(s1, 100, "@%s$%s\n", cw->cur_fn, label);
+    fputs(s1, cw->fp);
+    fputs("0;JMP\n", cw->fp);
+}
+
+void write_if(struct CodeWriter *cw, char *label) {
+    if (!cw->cur_fn) {
+        end_code_writer(cw);
+        fprintf(stderr, "%s\n", "Gotos can only be inside functions.");
+        exit(1);
+    }
+    pop_and_address(cw);
+    fputs("D=M\n", cw->fp);
+    char s1[10];
+    snprintf(s1, 10, "@j%dcont\n", cw->jmp_label);
+    fputs(s1, cw->fp);
+    fputs("D;JEQ\n", cw->fp);
+    char s2[100];
+    snprintf(s2, 100, "@%s$%s\n", cw->cur_fn, label);
+    fputs(s2, cw->fp);
+    fputs("0;JMP\n", cw->fp);
+    char s3[10];
+    snprintf(s3, 10, "(j%dcont)\n", cw->jmp_label);
+    fputs(s3, cw->fp);
+    cw->jmp_label++;
+}
+
+void write_function(struct CodeWriter *cw, char *function_name, int n_vars) {
+    cw->cur_fn = function_name;
+    char s1[100];
+    snprintf(s1, 100, "(%s)\n", function_name);
+    fputs(s1, cw->fp);
+    if (n_vars != 0)
+        address_stack(cw);
+    for (int i = 0; i < n_vars; i++) {
+        fputs("M=0\n", cw->fp);
+        fputs("@SP\n", cw->fp);
+        fputs("AM=M+1\n", cw->fp);
+    }
+}
+
+void write_call(struct CodeWriter *cw, char *function_name, int n_args) {
+    // push return address
+    char s1[100];
+    snprintf(s1, 100, "@%s$ret%d\n", cw->cur_fn, cw->fn_ret_label);
+    fputs(s1, cw->fp);
+    fputs("D=A\n", cw->fp);
+    address_stack(cw);
+    fputs("M=D\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=M+1\n", cw->fp);
+    // push local
+    fputs("@LCL\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    address_stack(cw);
+    fputs("M=D\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=M+1\n", cw->fp);
+    // push argument
+    fputs("@ARG\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    address_stack(cw);
+    fputs("M=D\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=M+1\n", cw->fp);
+    // push this
+    fputs("@THIS\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    address_stack(cw);
+    fputs("M=D\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=M+1\n", cw->fp);
+    // push that
+    fputs("@THAT\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    address_stack(cw);
+    fputs("M=D\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=M+1\n", cw->fp);
+    // ARG = SP - 5 - n_args
+    fputs("@5\n", cw->fp);
+    fputs("D=A\n", cw->fp);
+    char s2[10];
+    snprintf(s2, 10, "@%d\n", n_args);
+    fputs(s2, cw->fp);
+    fputs("D=D+A\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("D=M-D\n", cw->fp);
+    fputs("@ARG\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // LCL = SP
+    fputs("@SP\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@LCL\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // goto function_name
+    char s3[100];
+    snprintf(s3, 100, "@%s\n", function_name);
+    fputs(s3, cw->fp);
+    fputs("0;JMP\n", cw->fp);
+    char s4[100];
+    snprintf(s4, 100, "(%s$ret%d)\n", cw->cur_fn, cw->fn_ret_label);
+    fputs(s4, cw->fp);
+    cw->fn_ret_label++;
+}
+
+void write_return(struct CodeWriter *cw) {
+    fputs("@LCL\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@R14\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    fputs("@5\n", cw->fp);
+    fputs("A=D-A\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@R15\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    pop_and_address(cw);
+    fputs("D=M\n", cw->fp);
+    fputs("@ARG\n", cw->fp);
+    fputs("A=M\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    fputs("@ARG\n", cw->fp);
+    fputs("D=M+1\n", cw->fp);
+    fputs("@SP\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // restore THAT
+    fputs("@R14\n", cw->fp);
+    fputs("A=M-1\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@THAT\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // restore THIS
+    fputs("@R14\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@2\n", cw->fp);
+    fputs("A=D-A\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@THIS\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // restore ARG
+    fputs("@R14\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@3\n", cw->fp);
+    fputs("A=D-A\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@ARG\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // restore LCL
+    fputs("@R14\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@4\n", cw->fp);
+    fputs("A=D-A\n", cw->fp);
+    fputs("D=M\n", cw->fp);
+    fputs("@LCL\n", cw->fp);
+    fputs("M=D\n", cw->fp);
+    // goto return address
+    fputs("@R15\n", cw->fp);
+    fputs("A=M\n", cw->fp);
+    fputs("0;JMP\n", cw->fp);
+}
+
+void end_code_writer(struct CodeWriter *cw) {
+    fclose(cw->fp);
+    free(cw->fn);
+}
