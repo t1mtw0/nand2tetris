@@ -11,6 +11,7 @@ pop local 0
 push local 0
 call Main.convert 1
 pop temp 0
+push constant 0
 return
 function Main.convert 3
 push constant 1
@@ -46,7 +47,6 @@ add
 push constant 1
 call Memory.poke 2
 pop temp 0
-if-goto L4
 goto L4
 label L3
 push constant 8000
@@ -56,7 +56,6 @@ push constant 0
 call Memory.poke 2
 pop temp 0
 label L4
-if-goto L5
 goto L5
 label L2
 push constant 0
@@ -64,6 +63,7 @@ pop local 2
 label L5
 goto L0
 label L1
+push constant 0
 return
 function Main.nextMask 0
 push argument 0
@@ -73,7 +73,6 @@ not
 if-goto L6
 push constant 1
 return
-if-goto L7
 goto L7
 label L6
 push argument 0
@@ -102,4 +101,5 @@ add
 pop argument 0
 goto L8
 label L9
+push constant 0
 return

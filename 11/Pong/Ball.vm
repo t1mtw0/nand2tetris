@@ -2,34 +2,36 @@ function Ball.new 0
 push constant 15
 call Memory.alloc 1
 pop pointer 0
-push argument 1
+push argument 0
 pop this 0
-push argument 2
+push argument 1
 pop this 1
-push argument 3
+push argument 2
 pop this 10
-push argument 4
+push argument 3
 push constant 6
 sub
 pop this 11
-push argument 5
+push argument 4
 pop this 12
-push argument 6
+push argument 5
 push constant 6
 sub
 pop this 13
 push constant 0
 pop this 14
-call Ball.show 0
+push pointer 0
+call Ball.show 1
 pop temp 0
-push this 0
+push pointer 0
 return
 function Ball.dispose 0
 push argument 0
 pop pointer 0
-push this 0
+push pointer 0
 call Memory.deAlloc 1
 pop temp 0
+push constant 0
 return
 function Ball.show 0
 push argument 0
@@ -37,8 +39,10 @@ pop pointer 0
 push constant 1
 call Screen.setColor 1
 pop temp 0
-call Ball.draw 0
+push pointer 0
+call Ball.draw 1
 pop temp 0
+push constant 0
 return
 function Ball.hide 0
 push argument 0
@@ -46,8 +50,10 @@ pop pointer 0
 push constant 0
 call Screen.setColor 1
 pop temp 0
-call Ball.draw 0
+push pointer 0
+call Ball.draw 1
 pop temp 0
+push constant 0
 return
 function Ball.draw 0
 push argument 0
@@ -62,6 +68,7 @@ push constant 5
 add
 call Screen.drawRectangle 4
 pop temp 0
+push constant 0
 return
 function Ball.getLeft 0
 push argument 0
@@ -113,7 +120,6 @@ push this 0
 push argument 1
 lt
 pop this 9
-if-goto L1
 goto L1
 label L0
 push this 0
@@ -141,11 +147,13 @@ push local 0
 sub
 call Math.multiply 2
 pop this 6
+push constant 0
 return
 function Ball.move 0
 push argument 0
 pop pointer 0
-call Ball.hide 0
+push pointer 0
+call Ball.hide 1
 pop temp 0
 push this 4
 push constant 0
@@ -156,7 +164,6 @@ push this 4
 push this 5
 add
 pop this 4
-if-goto L3
 goto L3
 label L2
 push this 4
@@ -173,7 +180,6 @@ push this 0
 push constant 4
 add
 pop this 0
-if-goto L6
 goto L6
 label L5
 push this 1
@@ -181,7 +187,6 @@ push constant 4
 add
 pop this 1
 label L6
-if-goto L7
 goto L7
 label L4
 push this 7
@@ -191,7 +196,6 @@ push this 0
 push constant 4
 sub
 pop this 0
-if-goto L9
 goto L9
 label L8
 push this 1
@@ -211,7 +215,6 @@ push this 1
 push constant 4
 add
 pop this 1
-if-goto L12
 goto L12
 label L11
 push this 0
@@ -219,7 +222,6 @@ push constant 4
 add
 pop this 0
 label L12
-if-goto L13
 goto L13
 label L10
 push this 7
@@ -229,7 +231,6 @@ push this 1
 push constant 4
 sub
 pop this 1
-if-goto L15
 goto L15
 label L14
 push this 0
@@ -248,7 +249,6 @@ push constant 1
 pop this 14
 push this 10
 pop this 0
-if-goto L17
 goto L17
 label L16
 label L17
@@ -262,7 +262,6 @@ push constant 2
 pop this 14
 push this 11
 pop this 0
-if-goto L19
 goto L19
 label L18
 label L19
@@ -276,7 +275,6 @@ push constant 3
 pop this 14
 push this 12
 pop this 1
-if-goto L21
 goto L21
 label L20
 label L21
@@ -290,11 +288,11 @@ push constant 4
 pop this 14
 push this 13
 pop this 1
-if-goto L23
 goto L23
 label L22
 label L23
-call Ball.show 0
+push pointer 0
+call Ball.show 1
 pop temp 0
 push this 14
 return
@@ -316,7 +314,6 @@ not
 if-goto L24
 push constant 10
 pop local 4
-if-goto L25
 goto L25
 label L24
 push this 2
@@ -340,7 +337,6 @@ not
 if-goto L26
 push constant 20
 pop local 4
-if-goto L27
 goto L27
 label L26
 push constant 5
@@ -367,7 +363,6 @@ push local 4
 call Math.multiply 2
 add
 pop local 1
-if-goto L29
 goto L29
 label L28
 push this 14
@@ -389,7 +384,6 @@ push local 4
 call Math.multiply 2
 add
 pop local 1
-if-goto L31
 goto L31
 label L30
 push this 14
@@ -412,7 +406,6 @@ push local 4
 call Math.multiply 2
 add
 pop local 0
-if-goto L33
 goto L33
 label L32
 push constant 0
@@ -432,8 +425,10 @@ pop local 0
 label L33
 label L31
 label L29
+push pointer 0
 push local 0
 push local 1
-call Ball.setDestination 2
+call Ball.setDestination 3
 pop temp 0
+push constant 0
 return

@@ -463,7 +463,6 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-if-goto L1
 goto L1
 label L0
 label L1
@@ -671,6 +670,7 @@ call Output.printInt 1
 pop temp 0
 call Output.println 0
 pop temp 0
+push constant 0
 return
 function Main.double 0
 push argument 0
@@ -699,4 +699,5 @@ push temp 0
 pop that 0
 goto L2
 label L3
+push constant 0
 return

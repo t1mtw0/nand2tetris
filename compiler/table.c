@@ -55,7 +55,7 @@ static struct Entry *find_entry(struct Entry *entries, int capacity,
                 if (tombstone == NULL)
                     tombstone = entry;
             }
-        } else if (!strncmp(entry->name, name, strlen(name))) {
+        } else if (!strcmp(entry->name, name)) {
             return entry;
         }
         hashed = (hashed + 1) & (capacity - 1);

@@ -193,7 +193,7 @@ void compile_subroutine(struct CompilationEngine *ce) {
     process(ce, T_IDENTIFIER, K_NONE, S_NONE,
             "Expected identifier in subroutine declaration.");
     char *name = extract_identifier(ce);
-    if (sub_type != K_FUNCTION) {
+    if (sub_type == K_METHOD) {
         char *this_str = malloc(sizeof(char) * 5);
         strncpy(this_str, "this", 5);
         int class_name_l = strlen(ce->class_name);
@@ -356,17 +356,16 @@ void compile_if(struct CompilationEngine *ce) {
     process(ce, T_SYMBOL, K_NONE, S_LEFT_PAREN, "Expected '(' after 'if'.");
     compile_expr(ce);
     write_arithmetic(ce->fop, A_NOT);
-    char lbl1[20];
-    snprintf(lbl1, 20, "L%d", ce->lbl_count++);
+    char lbl1[50];
+    snprintf(lbl1, 50, "L%d", ce->lbl_count++);
     write_if(ce->fop, lbl1);
     process(ce, T_SYMBOL, K_NONE, S_RIGHT_PAREN,
             "Expected ')' after expression.");
     process(ce, T_SYMBOL, K_NONE, S_LEFT_BRACE,
             "Expected '{' after if condition.");
     compile_stmts(ce);
-    char lbl2[20];
-    snprintf(lbl2, 20, "L%d", ce->lbl_count++);
-    write_if(ce->fop, lbl2);
+    char lbl2[50];
+    snprintf(lbl2, 50, "L%d", ce->lbl_count++);
     write_goto(ce->fop, lbl2);
     write_label(ce->fop, lbl1);
     process(ce, T_SYMBOL, K_NONE, S_RIGHT_BRACE, "Expected '}' after if body.");
@@ -382,13 +381,13 @@ void compile_if(struct CompilationEngine *ce) {
 
 void compile_while(struct CompilationEngine *ce) {
     process(ce, T_SYMBOL, K_NONE, S_LEFT_PAREN, "Expected '(' after 'if'.");
-    char lbl1[20];
-    snprintf(lbl1, 20, "L%d", ce->lbl_count++);
+    char lbl1[50];
+    snprintf(lbl1, 50, "L%d", ce->lbl_count++);
     write_label(ce->fop, lbl1);
     compile_expr(ce);
     write_arithmetic(ce->fop, A_NOT);
-    char lbl2[20];
-    snprintf(lbl2, 20, "L%d", ce->lbl_count++);
+    char lbl2[50];
+    snprintf(lbl2, 50, "L%d", ce->lbl_count++);
     write_if(ce->fop, lbl2);
     process(ce, T_SYMBOL, K_NONE, S_RIGHT_PAREN,
             "Expected ')' after expression.");
@@ -410,6 +409,8 @@ void compile_do(struct CompilationEngine *ce) {
 void compile_return(struct CompilationEngine *ce) {
     if (!check(ce, T_SYMBOL, K_NONE, S_SEMICOLON))
         compile_expr(ce);
+    else
+        write_push(ce->fop, SEG_CONSTANT, 0);
     write_return(ce->fop);
     process(ce, T_SYMBOL, K_NONE, S_SEMICOLON,
             "Expected ';' after return statement.");
@@ -417,33 +418,37 @@ void compile_return(struct CompilationEngine *ce) {
 
 void compile_expr(struct CompilationEngine *ce) {
     compile_term(ce);
-    if (match(ce, T_SYMBOL, K_NONE, S_PLUS)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_ADD);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_SUB)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_SUB);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_MULT)) {
-        compile_term(ce);
-        write_call(ce->fop, "Math.multiply", 2);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_DIV)) {
-        compile_term(ce);
-        write_call(ce->fop, "Math.divide", 2);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_AND)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_AND);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_OR)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_OR);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_LESS_THAN)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_LT);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_GREATER_THAN)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_GT);
-    } else if (match(ce, T_SYMBOL, K_NONE, S_EQUAL)) {
-        compile_term(ce);
-        write_arithmetic(ce->fop, A_EQ);
+    while (true) {
+        if (match(ce, T_SYMBOL, K_NONE, S_PLUS)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_ADD);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_SUB)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_SUB);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_MULT)) {
+            compile_term(ce);
+            write_call(ce->fop, "Math.multiply", 2);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_DIV)) {
+            compile_term(ce);
+            write_call(ce->fop, "Math.divide", 2);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_AND)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_AND);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_OR)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_OR);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_LESS_THAN)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_LT);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_GREATER_THAN)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_GT);
+        } else if (match(ce, T_SYMBOL, K_NONE, S_EQUAL)) {
+            compile_term(ce);
+            write_arithmetic(ce->fop, A_EQ);
+        } else {
+            break;
+        }
     }
 }
 
@@ -466,7 +471,7 @@ void compile_term(struct CompilationEngine *ce) {
     } else if (match(ce, T_KEYWORD, K_NULL, S_NONE)) {
         write_push(ce->fop, SEG_CONSTANT, 0);
     } else if (match(ce, T_KEYWORD, K_THIS, S_NONE)) {
-        write_push(ce->fop, SEG_THIS, 0);
+        write_push(ce->fop, SEG_POINTER, 0);
     } else if (match(ce, T_IDENTIFIER, K_NONE, S_NONE)) {
         char *name = extract_identifier(ce);
         enum Kinds k = kind_of(&ce->sym_t_sr, name);
@@ -493,32 +498,33 @@ void compile_term(struct CompilationEngine *ce) {
             break;
         }
         if (match(ce, T_SYMBOL, K_NONE, S_LEFT_PAREN)) {
+            write_push(ce->fop, SEG_POINTER, 0);
             int n_args = compile_expr_list(ce);
             process(ce, T_SYMBOL, K_NONE, S_RIGHT_PAREN,
                     "Expected ')' after expression list.");
             char *call_name = make_sr_name(ce, NULL, name);
-            write_call(ce->fop, call_name, n_args);
+            write_call(ce->fop, call_name, n_args + 1);
         } else if (match(ce, T_SYMBOL, K_NONE, S_DOT)) {
             process(ce, T_IDENTIFIER, K_NONE, S_NONE,
                     "Expected subroutine name after '.'.");
             char *sr_name = extract_identifier(ce);
             process(ce, T_SYMBOL, K_NONE, S_LEFT_PAREN,
                     "Expected '(' after subroutine name.");
-            if (kind_of(&ce->sym_t_c, sr_name) != KD_NONE ||
-                kind_of(&ce->sym_t_sr, sr_name) != KD_NONE)
+            if (kind_of(&ce->sym_t_c, name) != KD_NONE ||
+                kind_of(&ce->sym_t_sr, name) != KD_NONE)
                 write_push(ce->fop, seg, index);
             int n_args = compile_expr_list(ce);
             process(ce, T_SYMBOL, K_NONE, S_RIGHT_PAREN,
                     "Expected ')' after expression list.");
-            if (kind_of(&ce->sym_t_c, sr_name) == KD_NONE &&
-                kind_of(&ce->sym_t_sr, sr_name) == KD_NONE) {
+            if (kind_of(&ce->sym_t_c, name) == KD_NONE &&
+                kind_of(&ce->sym_t_sr, name) == KD_NONE) {
                 char *call_name = make_sr_name(ce, name, sr_name);
                 write_call(ce->fop, call_name, n_args);
-            } else if (kind_of(&ce->sym_t_c, sr_name) != KD_NONE) {
+            } else if (kind_of(&ce->sym_t_c, name) != KD_NONE) {
                 char *class_name = type_of(&ce->sym_t_c, name);
                 char *call_name = make_sr_name(ce, class_name, sr_name);
                 write_call(ce->fop, call_name, n_args + 1);
-            } else if (kind_of(&ce->sym_t_sr, sr_name) != KD_NONE) {
+            } else if (kind_of(&ce->sym_t_sr, name) != KD_NONE) {
                 char *class_name = type_of(&ce->sym_t_sr, name);
                 char *call_name = make_sr_name(ce, class_name, sr_name);
                 write_call(ce->fop, call_name, n_args + 1);
