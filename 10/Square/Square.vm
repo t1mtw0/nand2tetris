@@ -1,0 +1,560 @@
+<class>
+	<className> Square <className>
+	<symbol>  </symbol>
+	<keyword>  </keyword>
+	<keyword>  </keyword>
+	<varName> x </varName>
+	<symbol>  </symbol>
+	<varName> y </varName>
+	<symbol>  </symbol>
+	<keyword>  </keyword>
+	<keyword>  </keyword>
+	<varName> size </varName>
+	<symbol>  </symbol>
+	<keyword>  </keyword>
+	<returnType> Square</returnType>
+	<identifier> new </identifier>
+	<symbol>  </symbol>
+	<type>  </type>
+	<varName> Ax</varName>
+	<symbol>  </symbol>
+	<type>  </type>
+	<varName> Ay </varName>
+	<symbol>  </symbol>
+	<type>  </type>
+	<varName> Asize </varName>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> let </keyword>
+	<varName> x</varName>
+	<symbol>  </symbol>
+	<identifier> Ax </identifier>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> y</varName>
+	<symbol>  </symbol>
+	<identifier> Ay </identifier>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> size</varName>
+	<symbol>  </symbol>
+	<identifier> Asize </identifier>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> draw </identifier>
+	<symbol> </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<keyword> this </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> dispose </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> do </keyword>
+	<identifier> Memory </identifier>
+	<symbol> </symbol>
+	<identifier> deAlloc </identifier>
+	<symbol> </symbol>
+	<keyword> this </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> draw </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> true </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> erase </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> false </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> incSize </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> < </symbol>
+	<term> 254 </term>
+	<symbol>  </symbol>
+	<symbol> & </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> < </symbol>
+	<term> 510 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> erase </identifier>
+	<symbol> </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> size</varName>
+	<symbol>  </symbol>
+	<identifier> size </identifier>
+	<symbol> + </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> draw </identifier>
+	<symbol> </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> decSize </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<identifier> size </identifier>
+	<symbol> > </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> erase </identifier>
+	<symbol> </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> size</varName>
+	<symbol>  </symbol>
+	<identifier> size </identifier>
+	<symbol> - </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> draw </identifier>
+	<symbol> </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> moveUp </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> > </symbol>
+	<term> 1 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> false </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> - </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> y</varName>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> - </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> true </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> moveDown </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> < </symbol>
+	<term> 254 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> false </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> y</varName>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> true </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> - </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> moveLeft </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> > </symbol>
+	<term> 1 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> false </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> - </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> x</varName>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> - </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> true </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword>  </keyword>
+	<returnType> </returnType>
+	<identifier> moveRight </identifier>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<keyword> if </keyword>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> < </symbol>
+	<term> 510 </term>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> false </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> let </keyword>
+	<varName> x</varName>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<term> 2 </term>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> setColor </identifier>
+	<symbol> </symbol>
+	<keyword> true </keyword>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<keyword> do </keyword>
+	<identifier> Screen </identifier>
+	<symbol> </symbol>
+	<identifier> drawRectangle </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol>  </symbol>
+	<symbol> - </symbol>
+	<term> 1 </term>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> </symbol>
+	<identifier> x </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<identifier> y </identifier>
+	<symbol> + </symbol>
+	<identifier> size </identifier>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+	<symbol>  </symbol>
+	<keyword> return </keyword>
+	<symbol>  </symbol>
+	<symbol> </symbol>
+	<symbol>  </symbol>
+</class>

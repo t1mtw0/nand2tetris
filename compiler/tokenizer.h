@@ -38,17 +38,41 @@ enum Keywords {
     K_THIS,
 };
 
+enum Symbols {
+    S_NONE,
+    S_LEFT_BRACE,
+    S_RIGHT_BRACE,
+    S_LEFT_PAREN,
+    S_RIGHT_PAREN,
+    S_LEFT_BRACKET,
+    S_RIGHT_BRACKET,
+    S_LESS_THAN,
+    S_GREATER_THAN,
+    S_EQUAL,
+    S_DOT,
+    S_COMMA,
+    S_SEMICOLON,
+    S_PLUS,
+    S_DIV,
+    S_SUB,
+    S_MULT,
+    S_AND,
+    S_OR,
+    S_TILDE,
+};
+
 struct Tokenizer {
-    char* source;
-    char* start;
-    char* current;
+    char *source;
+    char *start;
+    char *current;
 };
 
 struct Token {
+    const char *begin;
+    int length;
     enum TokenType type;
     enum Keywords kw;
-    const char* begin;
-    int length;
+    enum Symbols sym;
 };
 
 struct Tokenizer new_tokenizer(FILE *fp);

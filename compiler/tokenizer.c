@@ -94,10 +94,13 @@ static enum Keywords is_keyword(struct Tokenizer *t) {
 }
 
 static struct Token make_token(struct Tokenizer *t, enum TokenType type,
-                               enum Keywords kw) {
+                               enum Keywords kw, enum Symbols sym) {
     int length = (int)(t->current - t->start);
-    struct Token tok = {
-        .type = type, .begin = t->start, .length = length, .kw = kw};
+    struct Token tok = {.begin = t->start,
+                        .length = length,
+                        .type = type,
+                        .kw = kw,
+                        .sym = sym};
     return tok;
 }
 
@@ -106,22 +109,22 @@ static struct Token ident_or_keyword(struct Tokenizer *t) {
         advance(t);
     enum Keywords kt = is_keyword(t);
     if (kt == K_NONE)
-        return make_token(t, T_IDENTIFIER, kt);
+        return make_token(t, T_IDENTIFIER, kt, S_NONE);
     else
-        return make_token(t, T_KEYWORD, kt);
+        return make_token(t, T_KEYWORD, kt, S_NONE);
 }
 
 static struct Token int_const(struct Tokenizer *t) {
     while (isdigit(peek(t)))
         advance(t);
-    return make_token(t, T_INT_CONST, K_NONE);
+    return make_token(t, T_INT_CONST, K_NONE, S_NONE);
 }
 
 static struct Token string_const(struct Tokenizer *t) {
     t->start++;
     while (peek(t) != '\"')
         advance(t);
-    struct Token tok = make_token(t, T_STRING_CONST, K_NONE);
+    struct Token tok = make_token(t, T_STRING_CONST, K_NONE, S_NONE);
     advance(t);
     return tok;
 }
@@ -158,7 +161,7 @@ struct Token scan_token(struct Tokenizer *t) {
     t->start = t->current;
 
     if (!has_more_tokens(t))
-        return make_token(t, T_EOF, K_NONE);
+        return make_token(t, T_EOF, K_NONE, S_NONE);
 
     char c = advance(t);
 
@@ -171,29 +174,29 @@ struct Token scan_token(struct Tokenizer *t) {
 
     switch (c) {
     case '{':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_LEFT_BRACE);
     case '}':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_RIGHT_BRACE);
     case '(':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_LEFT_PAREN);
     case ')':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_RIGHT_PAREN);
     case '[':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_LEFT_BRACKET);
     case ']':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_RIGHT_BRACKET);
     case '.':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_DOT);
     case ',':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_COMMA);
     case ';':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_SEMICOLON);
     case '+':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_PLUS);
     case '-':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_SUB);
     case '*':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_MULT);
     case '/':
         if (peek(t) == '/') {
             while (peek(t) != '\n' && has_more_tokens(t))
@@ -213,19 +216,19 @@ struct Token scan_token(struct Tokenizer *t) {
             advance(t);
             return scan_token(t);
         }
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_DIV);
     case '&':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_AND);
     case '|':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_OR);
     case '<':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_LESS_THAN);
     case '>':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_GREATER_THAN);
     case '=':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_EQUAL);
     case '~':
-        return make_token(t, T_SYMBOL, K_NONE);
+        return make_token(t, T_SYMBOL, K_NONE, S_TILDE);
     default:
         fprintf(stderr, "%s", "Unrecognized token while scanning.");
         exit(1);

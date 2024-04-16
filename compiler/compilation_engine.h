@@ -2,18 +2,28 @@
 #define COMPILATION_ENGINE_H
 
 #include "common.h"
+#include "table.h"
+#include "tokenizer.h"
 
 struct CompilationEngine {
-    FILE *fip;
+    char *class_name;
+    struct Tokenizer *t;
     FILE *fop;
+    struct Token current;
+    struct Token previous;
+    struct Table sym_t_c;
+    struct Table sym_t_sr;
+    int lbl_count;
 };
 
-struct CompilationEngine new_compilation_engine(FILE *fip, FILE *fop);
+struct CompilationEngine new_compilation_engine(struct Tokenizer *t, FILE *fop);
+void compile(struct CompilationEngine *ce);
 void compile_class(struct CompilationEngine *ce);
 void compile_class_var_dec(struct CompilationEngine *ce);
 void compile_subroutine(struct CompilationEngine *ce);
 void compile_par_list(struct CompilationEngine *ce);
-void compile_subroutine_body(struct CompilationEngine *ce);
+void compile_subroutine_body(struct CompilationEngine *ce, char *name,
+                             enum Keywords sub_type);
 void compile_var_dec(struct CompilationEngine *ce);
 void compile_stmts(struct CompilationEngine *ce);
 void compile_let(struct CompilationEngine *ce);
